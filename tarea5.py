@@ -36,6 +36,7 @@ def barycentric(A,B,C,P):
 	
 V2 = namedtuple('Point2', ['x', 'y'])
 V3 = namedtuple('Point3', ['x', 'y', 'z'])
+V4 = namedtuple('Point3', ['x', 'y', 'z', 'color'])
 	
 
 			
@@ -214,13 +215,13 @@ class Obj(object):
 			current_material = None
 			
 			for line in self.lines:
-				prefix, value = line.split(' ', 1)
-				if prefix == "newmtl":
-					current_material = value
-				if prefix == "Kd":
-					kd = [value.split(' ')] #convertir value a color
-					print(kd)
-					self.materials[current_material] = kd
+				if line:
+					prefix, value = line.split(' ', 1)
+					if prefix == "newmtl":
+						current_material = value
+					if prefix == "Kd":
+						kd = [value.split(' ')] #convertir value a color
+						self.materials[current_material] = kd
 
 
 		self.vertices = []
@@ -292,17 +293,17 @@ class Obj(object):
 	def Color(self, x,y,color):
 		self.framebuffer[int(round(self.sy + y))][int(round(self.sx + x ))] = color
 
-	def FltoPixelsX(self, x0):
+	def NormX(self, x0):
 		return int(round(((x0*(self.viewwidth/2))+self.sx)))
 		
-	def FltoPixelsY(self, y0):
+	def NormY(self, y0):
 		return int(round((y0*(self.viewheight/3))+self.sy))
 		
 	def transform(self, vertex):
 		return V3(
-			self.FltoPixelsX(vertex[0]),
-			self.FltoPixelsY(vertex[1]),
-			self.FltoPixelsY(vertex[2])
+			self.NormX(vertex[0]),
+			self.NormY(vertex[1]),
+			self.NormY(vertex[2])
 		)
 	
 	def point(self, x, y, color):
@@ -340,12 +341,8 @@ class Obj(object):
 				elif prefix == "usemtl":
 					current_material = value
 				elif prefix == 'f':
-					try:
-						colrs = self.materials[current_material] 
-						self.vfaces.append([list(map(try_int, face.split('/'))) for face in value.split(' ')].extend(colrs))
-						#print(self.vfaces)
-					except:
-						continue
+					colrs = self.materials[current_material] 
+					self.vfaces.append([list(map(try_int, face.split('/'))) for face in value.split(' ')].extend(colrs))
 	
 	
 		
@@ -357,15 +354,14 @@ class Obj(object):
 			vcount = len(face)
 
 			if vcount == 3:
-				f1 = face[0][0] - 1
-				f2 = face[1][0] - 1
-				f3 = face[2][0] - 1
+				f1 = face[0][0][0] - 1
+				f2 = face[1][0][1] - 1
+				f3 = face[2][0][2] - 1
 
-				a = V3(*model.vertices[f1])
-				b = V3(*model.vertices[f2])
-				c = V3(*model.vertices[f3])
+				a = V4(*model.vertices[f1])
+				b = V4(*model.vertices[f2])
+				c = V4(*model.vertices[f3])
 
-				print(a,b,c)
 
 				normal = norm(cross(sub(b,a), sub(c,a)))
 				intensity = dot(normal, light)
