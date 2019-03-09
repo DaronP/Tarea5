@@ -354,18 +354,34 @@ class Obj(object):
 			vcount = len(face)
 
 			if vcount == 3:
-				f1 = face[0][0][0] - 1
-				f2 = face[1][0][1] - 1
-				f3 = face[2][0][2] - 1
+				face.pop(2)			
 
-				a = V4(*model.vertices[f1])
-				b = V4(*model.vertices[f2])
-				c = V4(*model.vertices[f3])
+				colr1 = [face[0][0][0]]
+				colr2 = [face[0][0][1]]
+				colr3 = [face[0][0][2]]
+
+				for i in range(0,1):
+					colr1.pop(i)
+					colr2.pop(i)
+					colr3.pop(i)
+
+				f1 = face[0][0] - 1
+				f2 = face[1][0] - 1
+				f3 = face[2][0] - 1
+
+				
+				
+
+				colr = V3(colr1, colr2, colr3)
+
+				a = V3(*model.vertices[f1])
+				b = V3(*model.vertices[f2])
+				c = V3(*model.vertices[f3])
 
 
 				normal = norm(cross(sub(b,a), sub(c,a)))
 				intensity = dot(normal, light)
-				grey = round(255 * intensity)
+				grey = round((255 * colr) * intensity)
 
 				a = self.transform(a)
 				b = self.transform(b)
