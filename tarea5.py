@@ -365,7 +365,7 @@ class Obj(object):
 				b = V3(*model.vertices[f2])
 				c = V3(*model.vertices[f3])
 
-				primt(a,b,c)
+				print(a,b,c)
 
 				normal = norm(cross(sub(b,a), sub(c,a)))
 				intensity = dot(normal, light)
@@ -421,7 +421,7 @@ al = 1280
 				
 im = glCreateWindow(an, al)
 
-r = Obj("Poopybutthole.obj", "Poopybutthole.mtl")
+r = Obj("Poopybutthole.obj")
 r.ViewPort(0,0,800,600)
 r.load("Poopybutthole.obj")
 l = Obj("Poopybutthole.mtl")
